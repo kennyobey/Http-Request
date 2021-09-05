@@ -16,13 +16,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> fetchPost() async {
-    await postViewModel.fetchAllPosts();
+    var provider = Provider.of<PostViewModel>(context, listen: false);
+    await provider.fetchAllPosts();
   }
 
   @override
   Widget build(BuildContext context) {
     var snapshot = Provider.of<PostViewModel>(context);
-    print(snapshot.allPosts);
     return Scaffold(
         appBar: AppBar(
           title: Text("Post result"),
@@ -30,7 +30,6 @@ class _MyHomePageState extends State<MyHomePage> {
         body: ListView.builder(
             itemCount: snapshot.allPosts?.length,
             itemBuilder: (context, i) {
-              print(snapshot.allPosts);
               return Card(
                 child: ListTile(
                   title: Text(
