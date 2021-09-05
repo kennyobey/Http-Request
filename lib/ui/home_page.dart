@@ -1,6 +1,6 @@
-import 'package:fetch_post/models/post_model.dart';
-import 'package:fetch_post/services/post_service.dart';
+import 'package:fetch_post/view_model/post_view_model.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   @override
@@ -8,48 +8,38 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final PostService postService = PostService();
+  PostViewModel postViewModel = PostViewModel();
+  @override
+  void initState() {
+    super.initState();
+    fetchPost();
+  }
+
+  Future<void> fetchPost() async {
+    await postViewModel.fetchAllPosts();
+  }
+
   @override
   Widget build(BuildContext context) {
+    var snapshot = Provider.of<PostViewModel>(context);
+    print(snapshot.allPosts);
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Post result"),
-      ),
-      body: FutureBuilder<List<Post>>(
-        future: postService.getPost(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Container(
-              child: Center(
-                child: Text('Loading...'),
-              ),
-            );
-          }
-          if (snapshot.hasError) {
-            return Container(
-              child: Center(
-                child: Text('Error...'),
-              ),
-            );
-          } else if (snapshot.hasData) {
-            return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, i) {
-                  return Card(
-                    child: ListTile(
-                      title: Text(snapshot.data![i].title ?? ""),
-                      subtitle: Text(snapshot.data![i].body ?? ""),
-                    ),
-                  );
-                });
-          }
-          return Container(
-            child: Center(
-              child: Text('Initial...'),
-            ),
-          );
-        },
-      ),
-    );
+        appBar: AppBar(
+          title: Text("Post result"),
+        ),
+        body: ListView.builder(
+            itemCount: snapshot.allPosts?.length,
+            itemBuilder: (context, i) {
+              print(snapshot.allPosts);
+              return Card(
+                child: ListTile(
+                  title: Text(
+                    snapshot.allPosts?[i].title ?? "",
+                    style: Theme.of(context).textTheme.bodyText1,
+                  ),
+                  subtitle: Text(snapshot.allPosts?[i].body ?? ""),
+                ),
+              );
+            }));
   }
 }
